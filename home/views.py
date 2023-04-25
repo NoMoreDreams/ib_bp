@@ -5,6 +5,9 @@ from django.shortcuts import render
 def home(request):
     return render(request, "home/home_page.html", {})
 
+def accounts(request):
+    return render(request, "home/accounts.html", {})
+
 
 @login_required(login_url="/admin")
 def authorized(request):
