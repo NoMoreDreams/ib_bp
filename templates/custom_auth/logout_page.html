@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block meta_tags %}
+  <meta http-equiv="refresh" content="3;url={% url 'login' %}">
+{% endblock %}
+
+{% block content %}
+    <h1>Logged Out</h1>
+    <p>You have been logged out.</p>
+{% endblock %}

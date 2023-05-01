@@ -3,8 +3,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}Internet Banking{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
+
+        {% block meta_tags %}{% endblock %}
         {% load bootstrap5 %}
         {% bootstrap_css %}
         {% bootstrap_javascript %}

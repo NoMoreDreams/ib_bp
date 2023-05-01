@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Account detail:</h1>
+    {{ account.iban }}
+
+    <h2>Transactions:</h2>
+    <ul>
+    {% for transaction in transactions %}
+      <li>Date: {{ transaction.date }} - Amount: {{ transaction.amount }} - Beneficiary: {{ transaction.beneficiary.iban }}</li>
+    {% empty %}
+      <li>No transactions found.</li>
+    {% endfor %}
+    </ul>
+    <button class="btn btn-primary btn-lg" type="button" onclick="location.href='{% url 'transaction_create' account.pk %}'">Send money</button>
+    <button class="btn btn-secondary btn-lg" type="button" onclick="location.href='{% url 'logout' %}'">Logout</button>
+{% endblock %}
