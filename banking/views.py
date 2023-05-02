@@ -23,7 +23,7 @@ class AccountsDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['transactions'] = Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object))
+        context['transactions'] = Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by("-date")
         return context
 
 

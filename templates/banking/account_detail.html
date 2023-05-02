@@ -1,16 +1,53 @@
 {% extends "base.html" %}
-{% block content %}
-    <h1>Account detail:</h1>
-    {{ account.iban }}
 
-    <h2>Transactions:</h2>
-    <ul>
-    {% for transaction in transactions %}
-      <li>Date: {{ transaction.date }} - Amount: {{ transaction.amount }} - Beneficiary: {{ transaction.beneficiary.iban }}</li>
-    {% empty %}
-      <li>No transactions found.</li>
-    {% endfor %}
-    </ul>
-    <button class="btn btn-primary btn-lg" type="button" onclick="location.href='{% url 'transaction_create' account.pk %}'">Send money</button>
-    <button class="btn btn-secondary btn-lg" type="button" onclick="location.href='{% url 'logout' %}'">Logout</button>
+{% block content %}
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ account.iban }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Balance: {{ account.balance }}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col">
+      <h2>Transactions</h2>
+      <ul class="list-group">
+        {% for transaction in transactions %}
+        <li class="list-group-item
+            {% if transaction.payer == account %}bg-danger text-white
+            {% elif transaction.beneficiary == account %}bg-success text-white{% endif %}">
+          <div class="row align-items-center">
+            <div class="col-6">
+              <h5 class="mb-0">{{ transaction.date }}</h5>
+              <p class="mb-0">{{ transaction.beneficiary.iban }}</p>
+            </div>
+            <div class="col-6 text-end">
+              <h5 class="mb-0">{% if transaction.payer == account %}-{{ transaction.amount }}{% else %}{{ transaction.amount }}{% endif %} €</h5>
+              {% if transaction.payer == account %}
+              <p class="mb-0 text-white">You paid</p>
+                {% elif transaction.beneficiary == account %}
+                    <p class="mb-0 text-white">You received</p>
+                {% endif %}
+            </div>
+          </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No transactions found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col text-center">
+      <a class="btn btn-primary" href="{% url 'transaction_create' account.pk %}" role="button">Send Money</a>
+      <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">Logout</a>
+    </div>
+  </div>
+</div>
 {% endblock %}
