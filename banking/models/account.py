@@ -9,6 +9,9 @@ class Account(models.Model):
     balance = models.FloatField(default=100_000)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"{self.user}'s account ({self.number})"
+
     @property
     def iban(self) -> str:
         country_code = 'SK'
