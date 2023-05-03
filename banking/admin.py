@@ -31,10 +31,10 @@ class BankingTransaction(admin.ModelAdmin):
 
 @admin.register(Account)
 class BankingAccount(admin.ModelAdmin):
-    list_display = ("iban", "balance")
-    list_filter = ("iban",)
-    list_display_links = ("iban",)
+    list_display = ("user", "account_number", "balance")
+    list_filter = ("user",)
+    list_display_links = ("user",)
 
-    @admin.display(description="IBAN", ordering="iban")
-    def format_iban(self, obj: Account):
-        return obj.iban
+    @admin.display(description="Account number")
+    def account_number(self, obj):
+        return obj.number
