@@ -21,6 +21,9 @@ class AccountsDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "account"
     template_name = "banking/account_detail.html"
 
+    def get_queryset(self):
+        return Account.objects.filter(user=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['transactions'] = Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by("-date")
