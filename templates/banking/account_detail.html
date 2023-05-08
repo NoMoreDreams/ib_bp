@@ -23,7 +23,7 @@
             {% elif transaction.beneficiary == account %}bg-success text-white{% endif %}">
           <div class="row align-items-center">
             <div class="col-6">
-              <h5 class="mb-0">{{ transaction.date }}</h5>
+              <h5 class="mb-0">{{ transaction.created }}</h5>
               <p class="mb-0">{{ transaction.beneficiary.iban }}</p>
             </div>
             <div class="col-6 text-end">
