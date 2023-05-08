@@ -21,11 +21,11 @@ class CustomTransactionAdminForm(ModelForm):
 
 @admin.register(Transaction)
 class BankingTransaction(admin.ModelAdmin):
-    date_hierarchy = "date"
-    list_display = ("amount", "date", "payer")
+    date_hierarchy = "created"
+    list_display = ("amount", "created", "payer")
     list_display_links = ("amount",)
     list_filter = ("is_processed",)
-    readonly_fields = ("date", "is_processed")
+    readonly_fields = ("created", "is_processed")
     form = CustomTransactionAdminForm
 
 
