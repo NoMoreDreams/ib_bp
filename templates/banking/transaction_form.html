@@ -1,68 +1,64 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="text-center mb-5">
-        <h1>Send Money</h1>
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="text-center mb-5">
+          <h1>Send Money</h1>
+        </div>
+        <form method="POST" class="row g-3">
+          {% csrf_token %}
+          <div class="col-12">
+            <strong>Payer:</strong> {{ payer_account }}
+          </div>
+          <div class="col-12">
+            <label for="{{ form.account_number.id_for_label }}">Account Number:</label>
+            {{ form.account_number }}
+            {% if form.account_number.errors %}
+              <div class="text-danger">{{ form.account_number.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12">
+            {{ form.amount.label_tag }}
+            {{ form.amount }}
+            {% if form.amount.errors %}
+              <div class="text-danger">{{ form.amount.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12">
+            {{ form.information.label_tag }}
+            {{ form.information }}
+            {% if form.information.errors %}
+              <div class="text-danger">{{ form.information.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12">
+            {{ form.variable_symbol.label_tag }}
+            {{ form.variable_symbol }}
+            {% if form.variable_symbol.errors %}
+              <div class="text-danger">{{ form.variable_symbol.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12">
+            {{ form.specific_symbol.label_tag }}
+            {{ form.specific_symbol }}
+            {% if form.specific_symbol.errors %}
+              <div class="text-danger">{{ form.specific_symbol.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12">
+            {{ form.constant_symbol.label_tag }}
+            {{ form.constant_symbol }}
+            {% if form.constant_symbol.errors %}
+              <div class="text-danger">{{ form.constant_symbol.errors|join:", " }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary w-100">Send</button>
+          </div>
+        </form>
       </div>
-      <form method="POST" class="row g-3">
-        {% csrf_token %}
-        <div class="col-12">
-          {{ form.payer.label_tag }}
-          {{ form.payer }}
-          {% if form.payer.errors %}
-          <div class="text-danger">{{ form.payer.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {{ form.beneficiary.label_tag }}
-          {{ form.beneficiary }}
-          {% if form.beneficiary.errors %}
-          <div class="text-danger">{{ form.beneficiary.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {{ form.amount.label_tag }}
-          {{ form.amount }}
-          {% if form.amount.errors %}
-          <div class="text-danger">{{ form.amount.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {{ form.information.label_tag }}
-          {{ form.information }}
-          {% if form.information.errors %}
-          <div class="text-danger">{{ form.information.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {{ form.variable_symbol.label_tag }}
-          {{ form.variable_symbol }}
-          {% if form.variable_symbol.errors %}
-          <div class="text-danger">{{ form.variable_symbol.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {{ form.specific_symbol.label_tag }}
-          {{ form.specific_symbol }}
-          {% if form.specific_symbol.errors %}
-          <div class="text-danger">{{ form.specific_symbol.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12">
-          {{ form.constant_symbol.label_tag }}
-          {{ form.constant_symbol }}
-          {% if form.constant_symbol.errors %}
-          <div class="text-danger">{{ form.constant_symbol.errors|join:", " }}</div>
-          {% endif %}
-        </div>
-        <div class="col-12 mt-4">
-          <button type="submit" class="btn btn-primary w-100">Send</button>
-        </div>
-      </form>
     </div>
   </div>
-</div>
 {% endblock %}

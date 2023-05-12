@@ -13,6 +13,32 @@
     </div>
   </div>
 
+<form method="GET">
+  <div class="row mb-3">
+    <div class="col">
+      <label for="date_from" class="form-label">From:</label>
+      <input type="date" name="date_from" id="date_from" value="{{ from_date }}" class="form-control">
+    </div>
+    <div class="col">
+      <label for="date_to" class="form-label">To:</label>
+      <input type="date" name="date_to" id="date_to" value="{{ to_date }}" class="form-control">
+    </div>
+    <div class="col">
+      <label for="beneficiary" class="form-label">Beneficiary:</label>
+      <select name="beneficiary" id="beneficiary" class="form-select">
+        <option value="">All Beneficiaries</option>
+         {% for account in accounts %}
+    <option value="{{ account.pk }}" {% if account.pk == selected_beneficiary %}selected{% endif %}>{{ account }}</option>
+  {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto align-self-end">
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+  </div>
+</form>
+
+
   <div class="row mt-4">
     <div class="col">
       <h2>Transactions</h2>
@@ -24,7 +50,11 @@
           <div class="row align-items-center">
             <div class="col-6">
               <h5 class="mb-0">{{ transaction.created }}</h5>
-              <p class="mb-0">{{ transaction.beneficiary.iban }}</p>
+            {% if transaction.beneficiary == account %}
+              <p class="mb-0">{{ transaction.payer.iban }}</p>
+            {% elif transaction.payer == account %}
+                <p class="mb-0">{{ transaction.beneficiary.iban }}</p>
+            {% endif %}
             </div>
             <div class="col-6 text-end">
               <h5 class="mb-0">{% if transaction.payer == account %}-{{ transaction.amount }}{% else %}{{ transaction.amount }}{% endif %} €</h5>
