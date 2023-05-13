@@ -10,5 +10,8 @@
       "src": "/(.*)",
       "dest": "bp_ib/wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "STATIC_ROOT": "/vercel/path0/public/staticfiles"
+  }
 }
