@@ -1,9 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
   "builds": [
     {
       "src": "bp_ib/wsgi.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.10" }
     },
     {
       "src": "build_files.sh",
