@@ -75,7 +75,7 @@
 
   <div class="row mt-4">
     <div class="col text-center">
-      <a class="btn btn-primary" href="{% url 'transaction_create' account.pk %}" role="button">Send Money</a>
+      <a class="btn btn-primary" href="{% url 'transaction_create' account.slug %}" role="button">Send Money</a>
       <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">Logout</a>
     </div>
   </div>

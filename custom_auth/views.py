@@ -1,6 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
+from django.views.generic import CreateView
+
+from custom_auth.forms import RegisterForm
+
+
+class CustomRegisterView(CreateView):
+    form_class = RegisterForm
+    success_url = reverse_lazy('login')
+    template_name = "custom_auth/register_page.html"
 
 
 class CustomLoginView(LoginView):
