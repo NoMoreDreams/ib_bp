@@ -34,6 +34,7 @@ class BankingAccount(admin.ModelAdmin):
     list_display = ("user", "account_number", "balance")
     list_filter = ("user",)
     list_display_links = ("user",)
+    prepopulated_fields = {"slug": ("user", "number")}
 
     @admin.display(description="Account number")
     def account_number(self, obj):

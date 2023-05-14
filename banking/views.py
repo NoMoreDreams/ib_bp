@@ -20,10 +20,11 @@ class AccountsListView(LoginRequiredMixin, ListView):
         return Account.objects.filter(user=self.request.user)
 
 
-class AccountsDetailView(LoginRequiredMixin, DetailView):
+class AccountDetailView(LoginRequiredMixin, DetailView):
     model = Account
     context_object_name = "account"
     template_name = "banking/account_detail.html"
+    slug_field = "slug"
 
     def get_queryset(self):
         return Account.objects.filter(user=self.request.user)
@@ -70,12 +71,12 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        payer_account = get_object_or_404(Account, user=self.request.user, pk=self.kwargs["pk"])
+        payer_account = get_object_or_404(Account, user=self.request.user, slug=self.kwargs["slug"])
         context["payer_account"] = payer_account
         return context
 
     def form_valid(self, form):
-        payer_account = get_object_or_404(Account, user=self.request.user, pk=self.kwargs["pk"])
+        payer_account = get_object_or_404(Account, user=self.request.user, slug=self.kwargs["slug"])
         account_number = form.cleaned_data["account_number"]
         try:
             beneficiary_account = Account.objects.get(number=account_number)
@@ -90,6 +91,10 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         amount = form.cleaned_data["amount"]
         if amount > payer_account.balance:
             form.add_error("amount", "Transaction amount cannot be greater than the payer\'s account balance")
+            return self.form_invalid(form)
+
+        if amount <= 0:
+            form.add_error("amount", "Transaction amount must be greater than zero")
             return self.form_invalid(form)
 
         # Subtract the amount from the payer's balance and save the account
@@ -110,4 +115,4 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("account_detail", kwargs={"pk": self.kwargs["pk"]})
+        return reverse_lazy("account_detail", kwargs={"slug": self.kwargs["slug"]})

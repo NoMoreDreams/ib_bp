@@ -18,7 +18,7 @@
                   <div class="card-body">
                     <h5 class="card-title">{{ account.iban }}</h5>
                     <p class="card-text">Balance: {{ account.balance }}</p>
-                    <a href="{% url 'account_detail' account.pk %}" class="btn btn-primary">View Transactions</a>
+                    <a href="{% url 'account_detail' account.slug %}" class="btn btn-primary">View Transactions</a>
                   </div>
                 </div>
               </div>
