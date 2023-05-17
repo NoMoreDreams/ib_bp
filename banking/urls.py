@@ -7,5 +7,6 @@ urlpatterns = [
     path("accounts/", views.AccountsListView.as_view(), name="account_list"),
     path("accounts/<slug:slug>", views.AccountDetailView.as_view(), name="account_detail"),
     path("accounts/<slug:slug>/transactions/new", views.TransactionCreateView.as_view(), name="transaction_create"),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path("accounts/<slug:slug>/transactions", views.TransactionListView.as_view(), name="transaction_list"),
+    path("", views.landing_page_view, name="landing_page")
 ]

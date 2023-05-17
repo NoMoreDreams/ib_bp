@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "navbar.html" %}
+
+    <div class="row mt-4">
+        <div class="col">
+            <form action="{% url "transaction_list" account.slug %}" method="GET" class="mb-4 mt-5 p-3">
+                <div class="input-group w-50 ml-5">
+                    <input type="text" name="q" class="form-control" placeholder="Hľadaj pomocou sumy alebo čísla účtu príjemcu">
+                    <button type="submit" class="btn btn-primary">Hľadaj</button>
+                </div>
+            </form>
+
+            {% if grouped_transactions %}
+                {% for transaction_date, transactions in grouped_transactions.items %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title">{{ transaction_date }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                {% for transaction in transactions %}
+                                    <li class="list-group-item
+                                        {% if transaction.payer == account %}bg-danger text-white
+                                        {% elif transaction.beneficiary == account %}bg-success text-white{% endif %}">
+                                        <div class="row align-items-center">
+                                            <div class="col-6">
+                                                <h5 class="mb-0">{{ transaction.created }}</h5>
+                                                {% if transaction.beneficiary == account %}
+                                                    <p class="mb-0">{{ transaction.payer.iban }}</p>
+                                                {% elif transaction.payer == account %}
+                                                    <p class="mb-0">{{ transaction.beneficiary.iban }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <h5 class="mb-0">{% if transaction.payer == account %}-{{ transaction.amount }}{% else %}{{ transaction.amount }}{% endif %} €</h5>
+                                                {% if transaction.payer == account %}
+                                                    <p class="mb-0 text-white">Zaplatené</p>
+                                                {% elif transaction.beneficiary == account %}
+                                                    <p class="mb-0 text-white">Obdržané</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h3 class="text-center">Neboli nájdené žiadne pohyby.</h3>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

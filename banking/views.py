@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.db.models import Q, Sum
+from django.db.models.functions import TruncDate
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
@@ -15,6 +14,7 @@ class AccountsListView(LoginRequiredMixin, ListView):
     model = Account
     context_object_name = "accounts"
     template_name = "banking/account_list.html"
+    extra_context = {"nvbar": "select_account"}
 
     def get_queryset(self):
         return Account.objects.filter(user=self.request.user)
@@ -25,6 +25,7 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "account"
     template_name = "banking/account_detail.html"
     slug_field = "slug"
+    extra_context = {"nbar": "home"}
 
     def get_queryset(self):
         return Account.objects.filter(user=self.request.user)
@@ -33,35 +34,108 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
 
         # Get the transaction filter parameters from the URL query string
-        from_date_str = self.request.GET.get("date_from")
-        to_date_str = self.request.GET.get("date_to")
-        beneficiary = self.request.GET.get("beneficiary")
-
-        # Convert the date strings to datetime objects
-        from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else None
-        to_date = datetime.strptime(to_date_str, '%Y-%m-%d') if to_date_str else None
+        # from_date_str = self.request.GET.get("date_from")
+        # to_date_str = self.request.GET.get("date_to")
+        # beneficiary = self.request.GET.get("beneficiary")
+        #
+        # # Convert the date strings to datetime objects
+        # from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else None
+        # to_date = datetime.strptime(to_date_str, '%Y-%m-%d') if to_date_str else None
 
         # Filter the transactions based on the parameters
-        transactions = Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by(
-            "-created")
-        if from_date:
-            transactions = transactions.filter(created__gte=from_date)
-        if to_date:
-            transactions = transactions.filter(created__lte=to_date)
-        if beneficiary:
-            transactions = transactions.filter(beneficiary_id=beneficiary)
+        # transactions = Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by(
+        #     "-created")
+        # if from_date:
+        #     transactions = transactions.filter(created__gte=from_date)
+        # if to_date:
+        #     transactions = transactions.filter(created__lte=to_date)
+        # if beneficiary:
+        #     transactions = transactions.filter(beneficiary_id=beneficiary)
+        most_expensive_transaction = Transaction.objects.filter(payer=self.object).order_by("-amount").first()
 
-        context["transactions"] = transactions
-        context["accounts"] = {transaction.beneficiary for transaction in Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by(
-            "-created")}
-        context["from_date"] = from_date_str
-        context["to_date"] = to_date_str
-        if beneficiary:
-            context["selected_beneficiary"] = int(beneficiary)
-        else:
-            context["selected_beneficiary"] = beneficiary
+        transaction_aggregate = Transaction.objects.filter(payer=self.object).values(
+            'beneficiary__user__username').annotate(total_amount=Sum("amount"))
+        beneficiaries = [item['beneficiary__user__username'] for item in transaction_aggregate]
+        amounts = [item['total_amount'] for item in transaction_aggregate]
+        context["beneficiaries"] = beneficiaries
+        context["amounts"] = amounts
+        context["most_expensive_transaction"] = most_expensive_transaction
+        # context["accounts"] = {transaction.beneficiary for transaction in
+        #                        Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by(
+        #                            "-created")}
+        # context["from_date"] = from_date_str
+        # context["to_date"] = to_date_str
+        # if beneficiary:
+        #     context["selected_beneficiary"] = int(beneficiary)
+        # else:
+        #     context["selected_beneficiary"] = beneficiary
 
         return context
+
+
+class TransactionListView(LoginRequiredMixin, ListView):
+    model = Account
+    context_object_name = "transactions"
+    template_name = "banking/transaction_list.html"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get("q", "")
+        current_acc = Account.objects.get(slug=self.kwargs["slug"])
+        queryset = Transaction.objects.filter((Q(payer=current_acc) | Q(beneficiary=current_acc)) &
+                                              (Q(amount__icontains=q) | Q(beneficiary__number__icontains=q)))
+
+        return queryset.annotate(transaction_date=TruncDate("created")).order_by("-created")
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["account"] = Account.objects.get(slug=self.kwargs["slug"])
+        context["nbar"] = "transactions"
+
+        transactions = context['transactions']
+
+        grouped_transactions = {}
+        for transaction in transactions:
+            transaction_date = transaction.transaction_date.strftime('%d. %m. %Y')
+            if transaction_date not in grouped_transactions:
+                grouped_transactions[transaction_date] = []
+            grouped_transactions[transaction_date].append(transaction)
+
+        context['grouped_transactions'] = grouped_transactions
+        return context
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #
+    #     # Get the transaction filter parameters from the URL query string
+    #     from_date_str = self.request.GET.get("date_from")
+    #     to_date_str = self.request.GET.get("date_to")
+    #     beneficiary = self.request.GET.get("beneficiary")
+    #
+    #     # Convert the date strings to datetime objects
+    #     from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else None
+    #     to_date = datetime.strptime(to_date_str, '%Y-%m-%d') if to_date_str else None
+    #
+    #     # Filter the transactions based on the parameters
+    #
+    #     if from_date:
+    #         transactions = transactions.filter(created__gte=from_date)
+    #     if to_date:
+    #         transactions = transactions.filter(created__lte=to_date)
+    #     if beneficiary:
+    #         transactions = transactions.filter(beneficiary_id=beneficiary)
+    #
+    #     context["transactions"] = transactions
+    #     context["accounts"] = {transaction.beneficiary for transaction in Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by(
+    #         "-created")}
+    #     context["from_date"] = from_date_str
+    #     context["to_date"] = to_date_str
+    #     if beneficiary:
+    #         context["selected_beneficiary"] = int(beneficiary)
+    #     else:
+    #         context["selected_beneficiary"] = beneficiary
+    #
+    #     return context
 
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
@@ -73,6 +147,7 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         payer_account = get_object_or_404(Account, user=self.request.user, slug=self.kwargs["slug"])
         context["payer_account"] = payer_account
+        context["account"] = Account.objects.get(slug=self.kwargs["slug"])
         return context
 
     def form_valid(self, form):
@@ -116,3 +191,7 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy("account_detail", kwargs={"slug": self.kwargs["slug"]})
+
+
+def landing_page_view(request):
+    return render(request, 'banking/landing_page.html')

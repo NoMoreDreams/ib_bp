@@ -1,64 +1,68 @@
 {% extends "base.html" %}
+{% load bootstrap5 %}
 
 {% block content %}
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-6">
-        <div class="text-center mb-5">
-          <h1>Send Money</h1>
+    {% include "navbar.html" %}
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="text-center mb-5 mt-3">
+                    <h1>Nová platba</h1>
+                </div>
+                <form method="POST" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-12">
+                        <strong>Payer:</strong> {{ payer_account }} <p class="text-muted">Zostatok: {{ payer_account.balance }} </p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.account_number.id_for_label }}">Číslo účtu príjemcu:</label>
+                        {% bootstrap_field form.account_number %}
+                        {% if form.account_number.errors %}
+                            <div class="text-danger">{{ form.account_number.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.amount.id_for_label }}">Suma:</label>
+                        {% bootstrap_field form.amount %}
+                        {% if form.amount.errors %}
+                            <div class="text-danger">{{ form.amount.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+{#                        <label class="form-label" for="{{ form.variable_symbol.id_for_label }}">Variabilný symbol:</label>#}
+                        {% bootstrap_field form.variable_symbol label="Variabilný symbol:" %}
+                        {% if form.variable_symbol.errors %}
+                            <div class="text-danger">{{ form.variable_symbol.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.specific_symbol.id_for_label }}">Špecifický symbol:</label>
+                        {% bootstrap_field form.specific_symbol %}
+                        {% if form.specific_symbol.errors %}
+                            <div class="text-danger">{{ form.specific_symbol.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.constant_symbol.id_for_label }}">Konštantný symbol:</label>
+                        {% bootstrap_field form.constant_symbol %}
+                        {% if form.constant_symbol.errors %}
+                            <div class="text-danger">{{ form.constant_symbol.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="{{ form.information.id_for_label }}">Informácia pre príjemcu:</label>
+                        {% bootstrap_field form.information %}
+                        {% if form.information.errors %}
+                            <div class="text-danger">{{ form.information.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary">Odoslať platbu</button>
+                        <a href="{% url "account_detail" account.slug %}" class="btn btn-outline-primary">Späť</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        <form method="POST" class="row g-3">
-          {% csrf_token %}
-          <div class="col-12">
-            <strong>Payer:</strong> {{ payer_account }}
-          </div>
-          <div class="col-12">
-            <label for="{{ form.account_number.id_for_label }}">Account Number:</label>
-            {{ form.account_number }}
-            {% if form.account_number.errors %}
-              <div class="text-danger">{{ form.account_number.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-          <div class="col-12">
-            {{ form.amount.label_tag }}
-            {{ form.amount }}
-            {% if form.amount.errors %}
-              <div class="text-danger">{{ form.amount.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-          <div class="col-12">
-            {{ form.information.label_tag }}
-            {{ form.information }}
-            {% if form.information.errors %}
-              <div class="text-danger">{{ form.information.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-          <div class="col-12">
-            {{ form.variable_symbol.label_tag }}
-            {{ form.variable_symbol }}
-            {% if form.variable_symbol.errors %}
-              <div class="text-danger">{{ form.variable_symbol.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-          <div class="col-12">
-            {{ form.specific_symbol.label_tag }}
-            {{ form.specific_symbol }}
-            {% if form.specific_symbol.errors %}
-              <div class="text-danger">{{ form.specific_symbol.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-          <div class="col-12">
-            {{ form.constant_symbol.label_tag }}
-            {{ form.constant_symbol }}
-            {% if form.constant_symbol.errors %}
-              <div class="text-danger">{{ form.constant_symbol.errors|join:", " }}</div>
-            {% endif %}
-          </div>
-          <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-primary w-100">Send</button>
-          </div>
-        </form>
-      </div>
     </div>
-  </div>
 {% endblock %}

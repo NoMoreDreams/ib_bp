@@ -1,83 +1,104 @@
 {% extends "base.html" %}
 
+{% block title %}Detail účtu{% endblock %}
+
 {% block content %}
-<div class="container my-4">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">{{ account.iban }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Balance: {{ account.balance }}</h6>
+    {% include "navbar.html" %}
+
+    <div class="container mt-5">
+        <div class="pt-5 row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="card-title text-center">Účet</h2>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Používateľ</h5>
+                        <p class="card-text">{{ account.user.username }}</p>
+                        <h5 class="card-title">IBAN</h5>
+                        <p class="card-text text-muted">{{ account.iban }}</p>
+                        <h5 class="card-title">Zostatok</h5>
+                        <p class="card-text">{{ account.balance|floatformat:2 }} EUR</p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a type="button" class="btn btn-success btn-lg" href="{% url "transaction_create" account.slug %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
+                          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"></path>
+                          <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"></path>
+                        </svg>
+                        Nová platba
+                      </a>
+                    </div>
+                    <div class="card mt-4">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="card-title text-center">Prehľad výdavkov</h2>
+                        </div>
+                        <div class="container card-body">
+                            <div class="row">
+                            {% if beneficiaries %}
+                                <canvas id="spendingChart" class="col-sm w-75 h-75"></canvas>
+                                <script defer>
+                                    const beneficiaries = {{ beneficiaries|safe }};
+                                    const amounts = {{ amounts|safe }};
+
+                                    var ctx = document.getElementById('spendingChart').getContext('2d');
+                                    var myChart = new Chart(ctx, {
+                                        type: 'pie',
+                                        data: {
+                                            labels: beneficiaries,
+                                            datasets: [{
+                                                data: amounts,
+                                                backgroundColor: generateBackgroundColors(beneficiaries.length),
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            plugins: {
+                                                legend: {
+                                                    position: "bottom"
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                    function generateBackgroundColors(count) {
+                                        const colors = [];
+                                        for (let i = 0; i < count; i++) {
+                                            const hue = (i * 137.5) % 360; // Adjust the hue increment to change color variation
+                                            const saturation = 75; // Adjust the saturation value for desired intensity
+                                            const lightness = 50; // Adjust the lightness value for desired brightness
+                                            const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+                                            colors.push(color);
+                                        }
+                                        return colors;
+                                    }
+                                </script>
+                            {% else %}
+                                <p class="text-muted text-center">Neboli nájdené transakcie pre vytvorenie grafu</p>
+                            {% endif %}
+                                <div class="card col-sm w-25 h-25">
+                                    <div class="card-header bg-info text-white">
+                                            <h4 class="card-title text-center">Najväčšia transakcia</h4>
+                                        </div>
+                                    {% if most_expensive_transaction %}
+                                    <div class="card-body">
+                                        <h5 class="card-title">Suma</h5>
+                                        <p class="card-text">{{ most_expensive_transaction.amount|floatformat:2 }} EUR</p>
+                                        <h5 class="card-title">Prijímateľ</h5>
+                                        <p class="card-text">{{ most_expensive_transaction.beneficiary.user.username }}</p>
+                                        <h5 class="card-title">Dátum</h5>
+                                        <p class="card-text">{{ most_expensive_transaction.created|date:"d. M. Y" }}</p>
+                                    </div>
+                                    {% else %}
+                                        <p class="text-muted text-center">Nebola nájdená žiadna transakcia</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-
-<form method="GET">
-  <div class="row mb-3">
-    <div class="col">
-      <label for="date_from" class="form-label">From:</label>
-      <input type="date" name="date_from" id="date_from" value="{{ from_date }}" class="form-control">
-    </div>
-    <div class="col">
-      <label for="date_to" class="form-label">To:</label>
-      <input type="date" name="date_to" id="date_to" value="{{ to_date }}" class="form-control">
-    </div>
-    <div class="col">
-      <label for="beneficiary" class="form-label">Beneficiary:</label>
-      <select name="beneficiary" id="beneficiary" class="form-select">
-        <option value="">All Beneficiaries</option>
-         {% for account in accounts %}
-    <option value="{{ account.pk }}" {% if account.pk == selected_beneficiary %}selected{% endif %}>{{ account }}</option>
-  {% endfor %}
-      </select>
-    </div>
-    <div class="col-auto align-self-end">
-      <button type="submit" class="btn btn-primary">Filter</button>
-    </div>
-  </div>
-</form>
-
-
-  <div class="row mt-4">
-    <div class="col">
-      <h2>Transactions</h2>
-      <ul class="list-group">
-        {% for transaction in transactions %}
-        <li class="list-group-item
-            {% if transaction.payer == account %}bg-danger text-white
-            {% elif transaction.beneficiary == account %}bg-success text-white{% endif %}">
-          <div class="row align-items-center">
-            <div class="col-6">
-              <h5 class="mb-0">{{ transaction.created }}</h5>
-            {% if transaction.beneficiary == account %}
-              <p class="mb-0">{{ transaction.payer.iban }}</p>
-            {% elif transaction.payer == account %}
-                <p class="mb-0">{{ transaction.beneficiary.iban }}</p>
-            {% endif %}
-            </div>
-            <div class="col-6 text-end">
-              <h5 class="mb-0">{% if transaction.payer == account %}-{{ transaction.amount }}{% else %}{{ transaction.amount }}{% endif %} €</h5>
-              {% if transaction.payer == account %}
-              <p class="mb-0 text-white">You paid</p>
-                {% elif transaction.beneficiary == account %}
-                    <p class="mb-0 text-white">You received</p>
-                {% endif %}
-            </div>
-          </div>
-        </li>
-        {% empty %}
-        <li class="list-group-item">No transactions found.</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
-
-  <div class="row mt-4">
-    <div class="col text-center">
-      <a class="btn btn-primary" href="{% url 'transaction_create' account.slug %}" role="button">Send Money</a>
-      <a class="btn btn-secondary" href="{% url 'logout' %}" role="button">Logout</a>
-    </div>
-  </div>
-</div>
 {% endblock %}
+

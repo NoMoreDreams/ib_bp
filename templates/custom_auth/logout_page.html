@@ -6,10 +6,13 @@
       <div class="col-md-6">
         <div class="card shadow-sm">
           <div class="card-body">
-            <h3 class="card-title text-center mb-4">You have been logged out</h3>
-            <p class="card-text text-center mb-4">We hope to see you again soon!</p>
+            <h3 class="card-title text-center mb-4">Boli ste úspešne odhlásení</h3>
+            <p class="card-text text-center mb-4">Dúfame, že sa čoskoro vidíme znova!</p>
             <div class="d-grid gap-2">
-              <a href="{% url 'login' %}" class="btn btn-primary">Login Again</a>
+              <a href="{% url 'login' %}" class="btn btn-primary">Prejsť na prihlásenie</a>
+            </div>
+              <div class="d-grid gap-2 mt-3">
+              <a href="{% url 'landing_page' %}" class="btn btn-primary">Prejsť na hlavnú stránku</a>
             </div>
           </div>
         </div>

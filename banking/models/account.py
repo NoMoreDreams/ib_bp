@@ -10,7 +10,7 @@ class Account(models.Model):
     slug = models.SlugField(default="", null=False)
 
     def __str__(self):
-        return f"{self.user}'s account ({self.number})"
+        return f"Používateľ {self.user} - účet ({self.number})"
 
     def save(self, *args, **kwargs):  # new
         if not self.slug:

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}IB{% endblock %}
+
+{% block content %}
+    <div class="jumbotron text-center">
+        <h1>Vitajte na stránkach Internetového bankovníctva</h1>
+        <p>Informácie o predmete nájdete <a href="https://maisportal.tuke.sk/portal/tlacPredmetuOSP.mais?predmetId=39742904&lang=sk">tu</a></p>
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Prihlásenie</a>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">Registrácia</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
