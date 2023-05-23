@@ -10,56 +10,82 @@
                 <div class="text-center mb-5 mt-3">
                     <h1>New payment</h1>
                 </div>
-                <form method="POST" class="row g-3">
+                <form method="POST" class="row g-3" id="payment-form">
                     {% csrf_token %}
                     <div class="col-12">
                         <strong>Payer:</strong> {{ payer_account }} <p class="text-muted">Available balance: {{ payer_account.balance }} </p>
                     </div>
                     <div class="col-12">
-{#                        <label class="form-label" for="{{ form.account_number.id_for_label }}">Beneficiary:</label>#}
                         {% bootstrap_field form.account_number %}
                         {% if form.account_number.errors %}
                             <div class="text-danger">{{ form.account_number.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                     <div class="col-12">
-{#                        <label class="form-label" for="{{ form.amount.id_for_label }}">Amount:</label>#}
                         {% bootstrap_field form.amount %}
                     </div>
                     <div class="col-12">
-{#                        <label class="form-label" for="{{ form.variable_symbol.id_for_label }}">Variabilný symbol:</label>#}
                         {% bootstrap_field form.variable_symbol %}
                         {% if form.variable_symbol.errors %}
                             <div class="text-danger">{{ form.variable_symbol.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                     <div class="col-12">
-{#                        <label class="form-label" for="{{ form.specific_symbol.id_for_label }}">Specific symbol:</label>#}
                         {% bootstrap_field form.specific_symbol %}
                         {% if form.specific_symbol.errors %}
                             <div class="text-danger">{{ form.specific_symbol.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                     <div class="col-12">
-{#                        <label class="form-label" for="{{ form.constant_symbol.id_for_label }}">Constant symbol:</label>#}
                         {% bootstrap_field form.constant_symbol %}
                         {% if form.constant_symbol.errors %}
                             <div class="text-danger">{{ form.constant_symbol.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                     <div class="col-12">
-{#                        <label class="form-label" for="{{ form.information.id_for_label }}">Information for beneficiary:</label>#}
                         {% bootstrap_field form.information %}
                         {% if form.information.errors %}
                             <div class="text-danger">{{ form.information.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                     <div class="col-12 mt-4">
-                        <button type="submit" class="btn btn-primary">Send payment</button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Send payment</button>
                         <a href="{% url "account_detail" account.slug %}" class="btn btn-outline-primary">Back</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to send the payment?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="payment-form" class="btn btn-primary">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Disable the "Enter" key functionality
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            const activeElement = document.activeElement;
+            const isFormInput = activeElement.tagName === "INPUT" || activeElement.tagName === "SELECT" || activeElement.tagName === "TEXTAREA";
+            if (isFormInput) {
+                event.preventDefault();
+            }
+        }
+    });
+</script>
+
 {% endblock %}
