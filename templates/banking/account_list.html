@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Kontá{% endblock %}
-
+{% block title %}Accounts{% endblock %}
+{% load static %}
 {% block content %}
-<div class="bg-dark py-3">
-    <h4 class="mb-0 text-white text-center">Vyber si svoj bankový účet</h4>
-</div>
+
+<nav class="navbar navbar-dark bg-dark fixed-top">
+  <div class="container-fluid d-flex justify-content-between">
+    <a class="navbar-brand" href="{% url "landing_page" %}">
+      <img src="{% static 'images/tuke_logo.png' %}" alt="Logo" class="logo-img">
+      Internet banking of Economic faculty TUKE
+    </a>
+  </div>
+</nav>
 
 <div class="container mt-5">
   <div class="row justify-content-center">
@@ -15,8 +21,9 @@
         <div class="card bg-primary text-white h-100 mt-5 mb-4">
           <a href="{% url 'account_detail' account.slug %}" class="btn btn-primary stretched-link">
             <div class="card-body">
+                <h3 class="card-title text-nowrap">{{ account.name }}</h3>
               <h5 class="card-title text-nowrap">{{ account.iban }}</h5>
-              <p class="card-text">Účtovný zostatok: {{ account.balance|floatformat:2 }} EUR</p>
+              <p class="card-text">Available balance: {{ account.balance|floatformat:2 }} EUR</p>
             </div>
           </a>
         </div>

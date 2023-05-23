@@ -1,96 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}Detail účtu{% endblock %}
+{% block title %}Account detail{% endblock %}
 
 {% block content %}
     {% include "navbar.html" %}
-
     <div class="container mt-5">
         <div class="pt-5 row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h2 class="card-title text-center">Účet</h2>
+                        <h2 class="card-title text-center">
+                            <span id="account-name">{{ account.name }}</span>
+                            <a href="#" class="float-none" data-bs-toggle="modal" data-bs-target="#updateAccountNameModal">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                </svg>
+                            </a>
+                        </h2>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Používateľ</h5>
+                        <h5 class="card-title">User</h5>
                         <p class="card-text">{{ account.user.username }}</p>
                         <h5 class="card-title">IBAN</h5>
                         <p class="card-text text-muted">{{ account.iban }}</p>
-                        <h5 class="card-title">Zostatok</h5>
+                        <h5 class="card-title">Available balance</h5>
                         <p class="card-text">{{ account.balance|floatformat:2 }} EUR</p>
                     </div>
                     <div class="card-footer text-center">
                         <a type="button" class="btn btn-success btn-lg" href="{% url "transaction_create" account.slug %}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
-                          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"></path>
-                          <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"></path>
-                        </svg>
-                        Nová platba
-                      </a>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"></path>
+                                <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"></path>
+                            </svg>
+                            New payment
+                        </a>
                     </div>
                     <div class="card mt-4">
                         <div class="card-header bg-primary text-white">
-                            <h2 class="card-title text-center">Prehľad výdavkov</h2>
+                            <h2 class="card-title text-center">Spending report</h2>
                         </div>
                         <div class="container card-body">
                             <div class="row">
-                            {% if beneficiaries %}
-                                <canvas id="spendingChart" class="col-sm w-75 h-75"></canvas>
-                                <script defer>
-                                    const beneficiaries = {{ beneficiaries|safe }};
-                                    const amounts = {{ amounts|safe }};
+                                {% if beneficiaries %}
+                                    <canvas id="spendingChart" class="col-sm w-75 h-75"></canvas>
+                                    <script defer>
+                                        const beneficiaries = {{ beneficiaries|safe }};
+                                        const amounts = {{ amounts|safe }};
 
-                                    var ctx = document.getElementById('spendingChart').getContext('2d');
-                                    var myChart = new Chart(ctx, {
-                                        type: 'pie',
-                                        data: {
-                                            labels: beneficiaries,
-                                            datasets: [{
-                                                data: amounts,
-                                                backgroundColor: generateBackgroundColors(beneficiaries.length),
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            plugins: {
-                                                legend: {
-                                                    position: "bottom"
+                                        var ctx = document.getElementById('spendingChart').getContext('2d');
+                                        var myChart = new Chart(ctx, {
+                                            type: 'pie',
+                                            data: {
+                                                labels: beneficiaries,
+                                                datasets: [{
+                                                    data: amounts,
+                                                    backgroundColor: generateBackgroundColors(beneficiaries.length),
+                                                }]
+                                            },
+                                            options: {
+                                                responsive: true,
+                                                plugins: {
+                                                    legend: {
+                                                        position: "bottom"
+                                                    }
                                                 }
                                             }
-                                        }
-                                    });
+                                        });
 
-                                    function generateBackgroundColors(count) {
-                                        const colors = [];
-                                        for (let i = 0; i < count; i++) {
-                                            const hue = (i * 137.5) % 360; // Adjust the hue increment to change color variation
-                                            const saturation = 75; // Adjust the saturation value for desired intensity
-                                            const lightness = 50; // Adjust the lightness value for desired brightness
-                                            const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-                                            colors.push(color);
+                                        function generateBackgroundColors(count) {
+                                            const colors = [];
+                                            for (let i = 0; i < count; i++) {
+                                                const hue = (i * 137.5) % 360; // Adjust the hue increment to change color variation
+                                                const saturation = 75; // Adjust the saturation value for desired intensity
+                                                const lightness = 50; // Adjust the lightness value for desired brightness
+                                                const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+                                                colors.push(color);
+                                            }
+                                            return colors;
                                         }
-                                        return colors;
-                                    }
-                                </script>
-                            {% else %}
-                                <p class="text-muted text-center">Neboli nájdené transakcie pre vytvorenie grafu</p>
-                            {% endif %}
+                                    </script>
+                                {% else %}
+                                    <p class="text-muted text-center">No transactions were found to create the chart</p>
+                                {% endif %}
                                 <div class="card col-sm w-25 h-25">
                                     <div class="card-header bg-info text-white">
-                                            <h4 class="card-title text-center">Najväčšia transakcia</h4>
-                                        </div>
-                                    {% if most_expensive_transaction %}
-                                    <div class="card-body">
-                                        <h5 class="card-title">Suma</h5>
-                                        <p class="card-text">{{ most_expensive_transaction.amount|floatformat:2 }} EUR</p>
-                                        <h5 class="card-title">Prijímateľ</h5>
-                                        <p class="card-text">{{ most_expensive_transaction.beneficiary.user.username }}</p>
-                                        <h5 class="card-title">Dátum</h5>
-                                        <p class="card-text">{{ most_expensive_transaction.created|date:"d. M. Y" }}</p>
+                                        <h4 class="card-title text-center">The biggest transaction</h4>
                                     </div>
+                                    {% if most_expensive_transaction %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">Amount</h5>
+                                            <p class="card-text">{{ most_expensive_transaction.amount|floatformat:2 }} EUR</p>
+                                            <h5 class="card-title">Beneficiary</h5>
+                                            <p class="card-text">{{ most_expensive_transaction.beneficiary.user.username }}</p>
+                                            <h5 class="card-title">Date</h5>
+                                            <p class="card-text">{{ most_expensive_transaction.created|date:"d. M. Y" }}</p>
+                                        </div>
                                     {% else %}
-                                        <p class="text-muted text-center">Nebola nájdená žiadna transakcia</p>
+                                        <p class="text-muted text-center">No transaction found</p>
                                     {% endif %}
                                 </div>
                             </div>
@@ -100,5 +107,26 @@
             </div>
         </div>
     </div>
+{#    modal    #}
+    <div class="modal fade" id="updateAccountNameModal" tabindex="-1" aria-labelledby="updateAccountNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{% url 'update_account_name' account.slug %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateAccountNameModalLabel">Update account name</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="account-name-input" class="form-label">Enter your new account name:</label>
+                    <input type="text" class="form-control" id="account-name-input" name="new_account_name" value="{{ account.name }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
-

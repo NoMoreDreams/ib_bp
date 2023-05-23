@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Prihlásenie{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
   <div class="container mt-5">
@@ -10,25 +10,25 @@
           <div class="card-body">
             {% if form.errors %}
               <div class="alert alert-danger" role="alert">
-                Zadané prihlasovacie meno a heslo sa nezhoduje. Skús to prosím znovu.
+                Entered username or password do not match. Please try again.
               </div>
             {% endif %}
-            <h3 class="card-title text-center mb-4">Prihlásenie</h3>
+            <h3 class="card-title text-center mb-4">Login</h3>
             <form method="post">
               {% csrf_token %}
               <div class="form-floating mb-3">
-                <input type="text" name="username" id="username" class="form-control" placeholder="Prihlasovacie meno" required>
-                <label for="username">Prihlasovacie meno</label>
+                <input type="text" name="username" id="username" class="form-control" placeholder="ab123cd" required>
+                <label for="username">Username</label>
               </div>
               <div class="form-floating mb-3">
-                <input type="password" name="password" id="password" class="form-control" placeholder="Heslo" required>
-                <label for="password">Heslo</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                <label for="password">Password</label>
               </div>
               <div class="text-center">
-                <button type="submit" class="btn btn-primary">Prihlásiť sa</button>
+                <button type="submit" class="btn btn-primary">Login</button>
               </div>
                 <div class="text-center mt-3">
-                <a href="{% url "landing_page" %}" class="btn btn-primary">Návrat na hlavnú stránku</a>
+                <a href="{% url "landing_page" %}" class="btn btn-primary">Main page</a>
               </div>
             </form>
           </div>

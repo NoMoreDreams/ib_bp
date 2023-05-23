@@ -11,17 +11,17 @@
         <div class="mb-3">
           {% bootstrap_field form.username %}
           {% if form.username.errors %}
-            <div class="alert alert-danger" role="alert">
-              {{ form.username.errors }}
-            </div>
+{#            <div class="alert alert-danger" role="alert">#}
+{#              {{ form.username.errors }}#}
+{#            </div>#}
           {% endif %}
         </div>
         <div class="mb-3">
           {% bootstrap_field form.first_name %}
           {% if form.first_name.errors %}
-            <div class="alert alert-danger" role="alert">
-              {{ form.first_name.errors }}
-            </div>
+{#            <div class="alert alert-danger" role="alert">#}
+{#              {{ form.first_name.errors }}#}
+{#            </div>#}
           {% endif %}
         </div>
         <div class="mb-3">
@@ -60,8 +60,8 @@
         </div>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary">Registrovať sa</button>
-    <a href="{% url "landing_page" %}" class="btn btn-outline-primary">Späť</a>
+    <button type="submit" class="btn btn-primary">Register</button>
+    <a href="{% url "landing_page" %}" class="btn btn-outline-primary">Back</a>
   </form>
 </div>
 {% endblock %}

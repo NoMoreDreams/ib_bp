@@ -2,13 +2,18 @@
 
 {% block content %}
     {% include "navbar.html" %}
-
+<div class="container my-4">
     <div class="row mt-4">
         <div class="col">
-            <form action="{% url "transaction_list" account.slug %}" method="GET" class="mb-4 mt-5 p-3">
+            <h4 class="mt-5">
+                        <span class="fw-bold">Transactions for account:</span>
+                        {{ account.iban }}
+            </h4>
+
+            <form action="{% url "transaction_list" account.slug %}" method="GET" class="mb-4 mt-3 p-3">
                 <div class="input-group w-50 ml-5">
-                    <input type="text" name="q" class="form-control" placeholder="Hľadaj pomocou sumy alebo čísla účtu príjemcu">
-                    <button type="submit" class="btn btn-primary">Hľadaj</button>
+                    <input type="text" name="q" class="form-control" placeholder="Search using amount or beneficiary">
+                    <button type="submit" class="btn btn-primary">Search</button>
                 </div>
             </form>
 
@@ -36,9 +41,10 @@
                                             <div class="col-6 text-end">
                                                 <h5 class="mb-0">{% if transaction.payer == account %}-{{ transaction.amount }}{% else %}{{ transaction.amount }}{% endif %} €</h5>
                                                 {% if transaction.payer == account %}
-                                                    <p class="mb-0 text-white">Zaplatené</p>
+                                                    <p class="mb-0 text-white">Sent</p>
+                                                    <a href="{% url "duplicate_transaction" account.slug transaction.id %}" class="btn btn-primary">Duplicate</a>
                                                 {% elif transaction.beneficiary == account %}
-                                                    <p class="mb-0 text-white">Obdržané</p>
+                                                    <p class="mb-0 text-white">Received</p>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -49,8 +55,9 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h3 class="text-center">Neboli nájdené žiadne pohyby.</h3>
+                <h3 class="text-center">No transactions found.</h3>
             {% endif %}
         </div>
     </div>
+</div>
 {% endblock %}
