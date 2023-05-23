@@ -2,15 +2,18 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
 
+from bp_ib.settings import DEFAULT_ACCOUNT_BALANCE
+
 
 class Account(models.Model):
     number = models.CharField(max_length=24)
-    balance = models.FloatField(default=100_000)
+    balance = models.FloatField(default=DEFAULT_ACCOUNT_BALANCE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     slug = models.SlugField(default="", null=False)
+    name = models.CharField(max_length=20, default="Current account")
 
     def __str__(self):
-        return f"{self.user}'s account ({self.number})"
+        return f"User {self.user} - account ({self.number})"
 
     def save(self, *args, **kwargs):  # new
         if not self.slug:
