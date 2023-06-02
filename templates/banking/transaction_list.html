@@ -7,7 +7,8 @@
         <div class="col">
             <h4 class="mt-5">
                         <span class="fw-bold">Transactions for account:</span>
-                        {{ account.iban }}
+                        {{ account.name }}
+                        <p class="card-text text-muted">{{ account.iban }}</p>
             </h4>
 
             <form action="{% url "transaction_list" account.slug %}" method="GET" class="mb-4 mt-3 p-3">

@@ -36,11 +36,6 @@
       <div class="col-md-6">
         <div class="mb-3">
           {% bootstrap_field form.email %}
-          {% if form.email.errors %}
-            <div class="alert alert-danger" role="alert">
-              {{ form.email.errors }}
-            </div>
-          {% endif %}
         </div>
         <div class="mb-3">
           {% bootstrap_field form.password1 %}

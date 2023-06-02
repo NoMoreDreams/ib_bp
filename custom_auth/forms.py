@@ -9,7 +9,7 @@ class RegisterForm(UserCreationForm):
     username = forms.CharField(max_length=7, help_text="Enter your TUKE login (ab123cd)")
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
-    email = forms.EmailField(max_length=254, help_text='Enter your TUKE valid email address (name.surname@tuke.student.sk')
+    email = forms.EmailField(max_length=254, help_text='Enter your TUKE valid email address (name.surname@student.tuke.sk')
 
     def clean_username(self):
         username = self.cleaned_data['username']
