@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,27 +14,63 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Account',
+            name="Account",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number', models.CharField(max_length=24)),
-                ('balance', models.FloatField(default=100000)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("number", models.CharField(max_length=24)),
+                ("balance", models.FloatField(default=100000)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Transaction',
+            name="Transaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.FloatField()),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('is_processed', models.BooleanField(default=False)),
-                ('information', models.TextField(null=True)),
-                ('variable_symbol', models.CharField(max_length=100, null=True)),
-                ('specific_symbol', models.CharField(max_length=100, null=True)),
-                ('constant_symbol', models.CharField(max_length=100, null=True)),
-                ('beneficiary', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='beneficiary_transaction_set', to='banking.account')),
-                ('payer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payer_transaction_set', to='banking.account')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.FloatField()),
+                ("date", models.DateTimeField(auto_now_add=True)),
+                ("is_processed", models.BooleanField(default=False)),
+                ("information", models.TextField(null=True)),
+                ("variable_symbol", models.CharField(max_length=100, null=True)),
+                ("specific_symbol", models.CharField(max_length=100, null=True)),
+                ("constant_symbol", models.CharField(max_length=100, null=True)),
+                (
+                    "beneficiary",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="beneficiary_transaction_set",
+                        to="banking.account",
+                    ),
+                ),
+                (
+                    "payer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payer_transaction_set",
+                        to="banking.account",
+                    ),
+                ),
             ],
         ),
     ]

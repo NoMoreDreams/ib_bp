@@ -4,35 +4,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('banking', '0001_initial'),
+        ("banking", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='transaction',
-            old_name='date',
-            new_name='created',
+            model_name="transaction",
+            old_name="date",
+            new_name="created",
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='constant_symbol',
+            model_name="transaction",
+            name="constant_symbol",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='information',
+            model_name="transaction",
+            name="information",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='specific_symbol',
+            model_name="transaction",
+            name="specific_symbol",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='variable_symbol',
+            model_name="transaction",
+            name="variable_symbol",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]

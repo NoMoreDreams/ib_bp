@@ -22,12 +22,12 @@ class Account(models.Model):
 
     @property
     def iban(self) -> str:
-        country_code = 'SK'
-        bank_code = '1100'
-        account_prefix = '000000'
+        country_code = "SK"
+        bank_code = "1100"
+        account_prefix = "000000"
 
         iban = f"{bank_code}{account_prefix}{self.number}"
-        check_digits = '{:02d}'.format(98 - (int(iban) * 100 % 97))
+        check_digits = "{:02d}".format(98 - (int(iban) * 100 % 97))
 
         iban = f"{country_code}{check_digits}{bank_code}{account_prefix}{self.number}"
         return iban

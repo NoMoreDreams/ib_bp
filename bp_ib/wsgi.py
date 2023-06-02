@@ -12,7 +12,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 from whitenoise import WhiteNoise
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bp_ib.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bp_ib.settings")
 
 application = get_wsgi_application()
 app = WhiteNoise(application)

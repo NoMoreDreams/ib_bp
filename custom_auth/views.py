@@ -8,7 +8,7 @@ from custom_auth.forms import RegisterForm
 
 class CustomRegisterView(CreateView):
     form_class = RegisterForm
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy("login")
     template_name = "custom_auth/register_page.html"
 
 
@@ -19,8 +19,8 @@ class CustomLoginView(LoginView):
 
 
 class CustomLogoutView(LogoutView):
-    template_name = 'custom_auth/logout_page.html'
-    success_url = reverse_lazy('login')
+    template_name = "custom_auth/logout_page.html"
+    success_url = reverse_lazy("login")
 
 
 def email_verification(request):

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('banking', '0002_rename_date_transaction_created_and_more'),
+        ("banking", "0002_rename_date_transaction_created_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='account',
-            name='slug',
-            field=models.SlugField(default=''),
+            model_name="account",
+            name="slug",
+            field=models.SlugField(default=""),
         ),
     ]

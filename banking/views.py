@@ -35,12 +35,19 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["nbar"] = "home"
         context["user"] = self.request.user
-        most_expensive_transaction = Transaction.objects.filter(payer=self.object).order_by("-amount").first()
+        most_expensive_transaction = (
+            Transaction.objects.filter(payer=self.object).order_by("-amount").first()
+        )
 
-        transaction_aggregate = Transaction.objects.filter(payer=self.object).values(
-            'beneficiary__user__username').annotate(total_amount=Sum("amount"))
-        beneficiaries = [item['beneficiary__user__username'] for item in transaction_aggregate]
-        amounts = [item['total_amount'] for item in transaction_aggregate]
+        transaction_aggregate = (
+            Transaction.objects.filter(payer=self.object)
+            .values("beneficiary__user__username")
+            .annotate(total_amount=Sum("amount"))
+        )
+        beneficiaries = [
+            item["beneficiary__user__username"] for item in transaction_aggregate
+        ]
+        amounts = [item["total_amount"] for item in transaction_aggregate]
         context["beneficiaries"] = beneficiaries
         context["amounts"] = amounts
         context["most_expensive_transaction"] = most_expensive_transaction
@@ -50,11 +57,11 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
 
 class UpdateAccountNameView(LoginRequiredMixin, View):
     def post(self, request, slug):
-        new_account_name = request.POST.get('new_account_name')
+        new_account_name = request.POST.get("new_account_name")
         account = get_object_or_404(Account, slug=slug, user=request.user)
         account.name = new_account_name
         account.save()
-        return redirect('account_detail', slug=slug)
+        return redirect("account_detail", slug=slug)
 
 
 class TransactionListView(LoginRequiredMixin, ListView):
@@ -66,10 +73,14 @@ class TransactionListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         q = self.request.GET.get("q", "")
         current_acc = Account.objects.get(slug=self.kwargs["slug"])
-        queryset = Transaction.objects.filter((Q(payer=current_acc) | Q(beneficiary=current_acc)) &
-                                              (Q(amount__icontains=q) | Q(beneficiary__number__icontains=q)))
+        queryset = Transaction.objects.filter(
+            (Q(payer=current_acc) | Q(beneficiary=current_acc))
+            & (Q(amount__icontains=q) | Q(beneficiary__number__icontains=q))
+        )
 
-        return queryset.annotate(transaction_date=TruncDate("created")).order_by("-created")
+        return queryset.annotate(transaction_date=TruncDate("created")).order_by(
+            "-created"
+        )
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,16 +88,16 @@ class TransactionListView(LoginRequiredMixin, ListView):
         context["nbar"] = "transactions"
         context["user"] = self.request.user
 
-        transactions = context['transactions']
+        transactions = context["transactions"]
 
         grouped_transactions = {}
         for transaction in transactions:
-            transaction_date = transaction.transaction_date.strftime('%d. %m. %Y')
+            transaction_date = transaction.transaction_date.strftime("%d. %m. %Y")
             if transaction_date not in grouped_transactions:
                 grouped_transactions[transaction_date] = []
             grouped_transactions[transaction_date].append(transaction)
 
-        context['grouped_transactions'] = grouped_transactions
+        context["grouped_transactions"] = grouped_transactions
         return context
 
     # def get_context_data(self, **kwargs):
@@ -130,27 +141,39 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        payer_account = get_object_or_404(Account, user=self.request.user, slug=self.kwargs["slug"])
+        payer_account = get_object_or_404(
+            Account, user=self.request.user, slug=self.kwargs["slug"]
+        )
         context["payer_account"] = payer_account
         context["account"] = Account.objects.get(slug=self.kwargs["slug"])
         return context
 
     def form_valid(self, form):
-        payer_account = get_object_or_404(Account, user=self.request.user, slug=self.kwargs["slug"])
+        payer_account = get_object_or_404(
+            Account, user=self.request.user, slug=self.kwargs["slug"]
+        )
         account_number = form.cleaned_data["account_number"]
         try:
             beneficiary_account = Account.objects.get(number=account_number)
         except Account.DoesNotExist:
-            form.add_error("account_number", "Please enter correct beneficiary account number")
+            form.add_error(
+                "account_number", "Please enter correct beneficiary account number"
+            )
             return super().form_invalid(form)
 
         if beneficiary_account == payer_account:
-            form.add_error("account_number", "Payer account cannot be the same as the beneficiary's account")
+            form.add_error(
+                "account_number",
+                "Payer account cannot be the same as the beneficiary's account",
+            )
             return super().form_invalid(form)
 
         amount = form.cleaned_data["amount"]
         if amount > payer_account.balance:
-            form.add_error("amount", "Transaction amount cannot be greater than the payer\'s account balance")
+            form.add_error(
+                "amount",
+                "Transaction amount cannot be greater than the payer's account balance",
+            )
             return self.form_invalid(form)
 
         if amount <= 0:
@@ -180,46 +203,60 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
 
 class DuplicateTransactionView(LoginRequiredMixin, FormView):
     form_class = SendMoneyForm
-    template_name = 'banking/duplicate_transaction.html'
+    template_name = "banking/duplicate_transaction.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        account = get_object_or_404(Account, slug=self.kwargs['slug'])
+        account = get_object_or_404(Account, slug=self.kwargs["slug"])
         context["account"] = account
-        context["payer_account"] = get_object_or_404(Transaction, id=self.kwargs['transaction_id'], payer=account).payer
+        context["payer_account"] = get_object_or_404(
+            Transaction, id=self.kwargs["transaction_id"], payer=account
+        ).payer
 
         return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        account = get_object_or_404(Account, slug=self.kwargs['slug'])
-        transaction = get_object_or_404(Transaction, id=self.kwargs['transaction_id'], payer=account)
-        kwargs['initial'] = {
-            'account_number': transaction.beneficiary.number,
-            'amount': transaction.amount,
-            'variable_symbol': transaction.variable_symbol,
-            'specific_symbol': transaction.specific_symbol,
-            'constant_symbol': transaction.constant_symbol,
-            'information': transaction.information
+        account = get_object_or_404(Account, slug=self.kwargs["slug"])
+        transaction = get_object_or_404(
+            Transaction, id=self.kwargs["transaction_id"], payer=account
+        )
+        kwargs["initial"] = {
+            "account_number": transaction.beneficiary.number,
+            "amount": transaction.amount,
+            "variable_symbol": transaction.variable_symbol,
+            "specific_symbol": transaction.specific_symbol,
+            "constant_symbol": transaction.constant_symbol,
+            "information": transaction.information,
         }
         return kwargs
 
     def form_valid(self, form):
-        payer_account = get_object_or_404(Account, user=self.request.user, slug=self.kwargs["slug"])
+        payer_account = get_object_or_404(
+            Account, user=self.request.user, slug=self.kwargs["slug"]
+        )
         account_number = form.cleaned_data["account_number"]
         try:
             beneficiary_account = Account.objects.get(number=account_number)
         except Account.DoesNotExist:
-            form.add_error("account_number", "Please enter correct beneficiary account number")
+            form.add_error(
+                "account_number", "Please enter correct beneficiary account number"
+            )
             return super().form_invalid(form)
 
         if beneficiary_account == payer_account:
-            form.add_error("account_number", "Payer account cannot be the same as the beneficiary's account")
+            form.add_error(
+                "account_number",
+                "Payer account cannot be the same as the beneficiary's account",
+            )
             return super().form_invalid(form)
 
         amount = form.cleaned_data["amount"]
         if amount > payer_account.balance:
-            form.add_error("amount", "Transaction amount cannot be greater than the payer\'s account balance")
+            form.add_error(
+                "amount",
+                "Transaction amount cannot be greater than the payer's account balance",
+            )
             return self.form_invalid(form)
 
         if amount <= 0:
@@ -246,5 +283,6 @@ class DuplicateTransactionView(LoginRequiredMixin, FormView):
     def get_success_url(self):
         return reverse_lazy("account_detail", kwargs={"slug": self.kwargs["slug"]})
 
+
 def landing_page_view(request):
-    return render(request, 'banking/landing_page.html')
+    return render(request, "banking/landing_page.html")
