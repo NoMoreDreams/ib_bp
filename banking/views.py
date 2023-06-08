@@ -70,7 +70,7 @@ class TransactionListView(LoginRequiredMixin, ListView):
     template_name = "banking/transaction_list.html"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        super().get_queryset()
         q = self.request.GET.get("q", "")
         current_acc = Account.objects.get(slug=self.kwargs["slug"])
         queryset = Transaction.objects.filter(
@@ -99,39 +99,6 @@ class TransactionListView(LoginRequiredMixin, ListView):
 
         context["grouped_transactions"] = grouped_transactions
         return context
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #
-    #     # Get the transaction filter parameters from the URL query string
-    #     from_date_str = self.request.GET.get("date_from")
-    #     to_date_str = self.request.GET.get("date_to")
-    #     beneficiary = self.request.GET.get("beneficiary")
-    #
-    #     # Convert the date strings to datetime objects
-    #     from_date = datetime.strptime(from_date_str, '%Y-%m-%d') if from_date_str else None
-    #     to_date = datetime.strptime(to_date_str, '%Y-%m-%d') if to_date_str else None
-    #
-    #     # Filter the transactions based on the parameters
-    #
-    #     if from_date:
-    #         transactions = transactions.filter(created__gte=from_date)
-    #     if to_date:
-    #         transactions = transactions.filter(created__lte=to_date)
-    #     if beneficiary:
-    #         transactions = transactions.filter(beneficiary_id=beneficiary)
-    #
-    #     context["transactions"] = transactions
-    #     context["accounts"] = {transaction.beneficiary for transaction in Transaction.objects.filter(Q(payer=self.object) | Q(beneficiary=self.object)).order_by(
-    #         "-created")}
-    #     context["from_date"] = from_date_str
-    #     context["to_date"] = to_date_str
-    #     if beneficiary:
-    #         context["selected_beneficiary"] = int(beneficiary)
-    #     else:
-    #         context["selected_beneficiary"] = beneficiary
-    #
-    #     return context
 
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):

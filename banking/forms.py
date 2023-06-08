@@ -23,12 +23,3 @@ class SendMoneyForm(forms.ModelForm):
             "constant_symbol",
         ]
         widgets = {"payer": forms.TextInput(attrs={"readonly": True})}
-
-    #
-    # def clean_account_number(self):
-    #     account_number = self.cleaned_data['account_number']
-    #     try:
-    #         beneficiary = Account.objects.get(number=account_number)
-    #     except Account.DoesNotExist:
-    #         raise forms.ValidationError('Invalid account number')
-    #     return beneficiary
