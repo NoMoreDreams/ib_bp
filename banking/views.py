@@ -12,6 +12,7 @@ from banking.forms import SendMoneyForm
 from banking.models.account import Account
 from banking.models.transaction import Transaction
 from banking.utils import generate_payment_pin
+from bp_ib.settings import EMAIL_HOST_USER
 
 
 class AccountsListView(LoginRequiredMixin, ListView):
@@ -268,7 +269,7 @@ class PaymentVerificationView(View):
         # Send the PIN to the user's email
         mail_subject = 'Payment Verification PIN'
         message = f'Your Payment Verification PIN is: {pin}'
-        send_mail(mail_subject, message, 'your_email_address', [transaction.payer.user.email])
+        send_mail(mail_subject, message, EMAIL_HOST_USER, [transaction.payer.user.email])
 
         return render(request, 'banking/payment_verification.html', {'transaction': transaction})
 

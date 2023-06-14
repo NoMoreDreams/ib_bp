@@ -11,6 +11,7 @@ from django.views import View
 from django.views.generic import CreateView, TemplateView
 
 from banking.models.account import Account
+from bp_ib.settings import EMAIL_HOST_USER
 from custom_auth.forms import RegisterForm
 from custom_auth.tokens import account_activation_token
 
@@ -40,7 +41,7 @@ class RegisterView(CreateView):
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             'token': account_activation_token.make_token(user),
         })
-        send_mail(mail_subject, message, 'your_email_address', [user.email])
+        send_mail(mail_subject, message, EMAIL_HOST_USER, [user.email])
 
         return response
 
@@ -68,10 +69,11 @@ class ActivateView(View):
                 'user': user,
                 'domain': self.request.META['HTTP_HOST'],
             })
-            send_mail(mail_subject, message, 'your_email_address', [user.email])
+            send_mail(mail_subject, message, EMAIL_HOST_USER, [user.email])
 
             # return HttpResponse('Thank you for your email confirmation. Now you can log in to your account.')
-            return render(request, 'custom_auth/email_confirmation.html', {'message': 'Thank you for your email confirmation. Now you can log in to your account.'})
+            return render(request, 'custom_auth/email_confirmation.html',
+                          {'message': 'Thank you for your email confirmation. Now you can log in to your account.'})
         else:
             return HttpResponse('Activation link is invalid!')
 
