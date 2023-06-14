@@ -83,6 +83,15 @@ class CustomLoginView(LoginView):
     success_url = reverse_lazy("account_list")
     redirect_authenticated_user = True
 
+    def form_valid(self, form):
+        if not form.get_user().is_active:
+            # return HttpResponseForbidden("Your account is not activated.")
+            form.add_error(
+                "username",
+                "Your account is not activated.",
+            )
+            return super().form_invalid(form)
+        return super().form_valid(form)
 
 class CustomLogoutView(LogoutView):
     template_name = "custom_auth/logout_page.html"
