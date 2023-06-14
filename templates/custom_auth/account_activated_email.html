@@ -1,0 +1,20 @@
+{% autoescape off %}
+Hi {{ user.username }},
+
+Your account has been successfully activated.
+You can login now here:
+http://{{ domain }}/login
+
+Your account details:
+
+name: {{ user.first_name }} {{ user.last_name }}
+username: {{ user.username }}
+Bank accounts:
+{% for account in accounts %}
+    Account name: {{ account.name }}
+    IBAN: {{ account.iban }}
+    balance: {{ account.balance }}
+{% endfor %}
+
+Sincerely, Internet banking of the Economic faculty TUKE.
+{% endautoescape %}

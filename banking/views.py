@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
 from django.db.models import Q, Sum
 from django.db.models.functions import TruncDate
 from django.shortcuts import get_object_or_404, render, redirect
@@ -10,6 +11,7 @@ from django.views.generic.base import View
 from banking.forms import SendMoneyForm
 from banking.models.account import Account
 from banking.models.transaction import Transaction
+from banking.utils import generate_payment_pin
 
 
 class AccountsListView(LoginRequiredMixin, ListView):
@@ -105,6 +107,7 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
     template_name = "banking/transaction_form.html"
     form_class = SendMoneyForm
+    transaction = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -161,16 +164,17 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         transaction.beneficiary = beneficiary_account
         transaction.account = payer_account
         transaction.save()
-
+        self.transaction = transaction
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("account_detail", kwargs={"slug": self.kwargs["slug"]})
+        return reverse_lazy("payment_verification", kwargs={"transaction_id": self.transaction.id})
 
 
 class DuplicateTransactionView(LoginRequiredMixin, FormView):
     form_class = SendMoneyForm
     template_name = "banking/duplicate_transaction.html"
+    transaction = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -244,12 +248,51 @@ class DuplicateTransactionView(LoginRequiredMixin, FormView):
         transaction.beneficiary = beneficiary_account
         transaction.account = payer_account
         transaction.save()
+        self.transaction = transaction
 
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("account_detail", kwargs={"slug": self.kwargs["slug"]})
+        return reverse_lazy("payment_verification", kwargs={"transaction_id": self.transaction.id})
 
 
 def landing_page_view(request):
     return render(request, "banking/landing_page.html")
+
+
+class PaymentVerificationView(View):
+    def get(self, request, transaction_id):
+        transaction = get_object_or_404(Transaction, id=transaction_id)
+        pin = generate_payment_pin()
+        request.session['payment_pin'] = pin
+        # Send the PIN to the user's email
+        mail_subject = 'Payment Verification PIN'
+        message = f'Your Payment Verification PIN is: {pin}'
+        send_mail(mail_subject, message, 'your_email_address', [transaction.payer.user.email])
+
+        return render(request, 'banking/payment_verification.html', {'transaction': transaction})
+
+    def post(self, request, transaction_id):
+        transaction = get_object_or_404(Transaction, id=transaction_id)
+        entered_pin = request.POST.get('pin')
+        stored_pin = request.session.get('payment_pin')
+        if entered_pin == stored_pin:
+            # Payment verification successful
+
+            return render(request, 'banking/account_detail.html', {'slug': transaction.payer.slug, "success": "Payment was successfull", "account": transaction.payer})
+
+        else:
+            # Incorrect PIN entered
+            # You can handle this case by displaying an error message
+            slug = transaction.payer.slug
+            account = transaction.payer
+            beneficiary = transaction.beneficiary
+
+            account.balance += transaction.amount
+            account.save()
+            beneficiary.balance -= transaction.amount
+            beneficiary.save()
+
+            transaction.delete()
+
+            return render(request, 'banking/account_detail.html', {'slug': slug, "error": "Invalid PIN. Payment was not processed.", "account": account})

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import UpdateAccountNameView
+from .views import UpdateAccountNameView, PaymentVerificationView
 
 urlpatterns = [
     path("accounts/", views.AccountsListView.as_view(), name="account_list"),
@@ -29,4 +29,5 @@ urlpatterns = [
         views.DuplicateTransactionView.as_view(),
         name="duplicate_transaction",
     ),
+    path('payment-verification/<int:transaction_id>/', PaymentVerificationView.as_view(), name='payment_verification'),
 ]

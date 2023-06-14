@@ -1,0 +1,11 @@
+{% autoescape off %}
+Hi {{ user.first_name }},
+
+Please click on the link below to verify your email and activate your account:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+If you didn't request this, please ignore this email.
+
+Sincerely, Internet banking of the Economic faculty TUKE.
+{% endautoescape %}
