@@ -10,3 +10,7 @@ def generate_account_number() -> str:
         return generate_account_number()
     else:
         return random_number
+
+
+def generate_payment_pin() -> str:
+    return "{:06d}".format(random.randint(0, 999999))

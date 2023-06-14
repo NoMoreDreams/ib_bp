@@ -4,7 +4,18 @@
 
 {% block content %}
     {% include "navbar.html" %}
+
     <div class="container mt-5">
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <p class="text-center">{{ error }}</p>
+        </div>
+        {% endif %}
+        {% if success %}
+        <div class="alert alert-success" role="alert">
+            <p class="text-center">{{ success }}</p>
+        </div>
+        {% endif %}
         <div class="pt-5 row justify-content-center">
             <div class="col-md-8">
                 <div class="card">

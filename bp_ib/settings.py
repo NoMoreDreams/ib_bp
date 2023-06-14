@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # LANGUAGE_CODE = 'sk'
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Bratislava"
 
 USE_I18N = True
 USE_L10N = True
@@ -146,4 +146,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'ib.ef.tuke@gmail.com'
-EMAIL_HOST_PASSWORD = 'j7A2MegxL:sqq.V'
+EMAIL_HOST_PASSWORD = 'lvdnqphkpvnqgfgq'

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block content %}
+{#    {% include "navbar.html" %}#}
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="text-center mb-5 mt-3">
+                    <h1>Payment Verification</h1>
+                </div>
+                <form method="POST" action="{% url 'payment_verification' transaction.id %}" id="payment-verify" class="row g-3">
+                    {% csrf_token %}
+                    <div class="col-12">
+                        <strong>Payer:</strong> {{ transaction.payer.user.username }}
+                        <p class="text-muted">Amount: {{ transaction.amount }}</p>
+                        <!-- Display other transaction details as needed -->
+                    </div>
+                    {% if error %}
+                    <div class="alert">{{ error }}</div>
+                    {% endif %}
+                        <label for="account-name-input" class="form-label">Enter pin:</label>
+                        <input type="text" class="form-control" id="pin" name="pin">
+                    <div class="col-12 mt-4">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Confirm Payment</button>
+{#                        <a href="{% url 'account_detail' transaction.account.slug %}" class="btn btn-outline-primary">Back</a>#}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to send the payment?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="payment-verify" class="btn btn-primary">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Disable the "Enter" key functionality
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            const activeElement = document.activeElement;
+            const isFormInput = activeElement.tagName === "INPUT" || activeElement.tagName === "SELECT" || activeElement.tagName === "TEXTAREA";
+            if (isFormInput) {
+                event.preventDefault();
+            }
+        }
+    });
+</script>
+
+{% endblock %}
