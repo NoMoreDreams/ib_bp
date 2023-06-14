@@ -33,9 +33,10 @@ class RegisterForm(UserCreationForm):
 
         # Define the desired email prefix
         desired_prefix = "@student.tuke.sk"
+        desired_prefix2 = "@tuke.sk"
 
         # Check if the email has the desired prefix
-        if not email.endswith(desired_prefix) and not email.endswith("@tuke.sk"):
+        if not email.endswith(desired_prefix) and not email.endswith(desired_prefix2):
             raise forms.ValidationError("Invalid email format.")
 
         return email
