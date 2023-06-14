@@ -4,7 +4,7 @@
 {% block content %}
 {#    {% include "navbar.html" %}#}
 
-    <div class="container my-5">
+    <div class="container my-5 card shadow-sm">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <div class="text-center mb-5 mt-3">
@@ -20,7 +20,7 @@
                     {% if error %}
                     <div class="alert">{{ error }}</div>
                     {% endif %}
-                        <label for="account-name-input" class="form-label">Enter pin:</label>
+                    <label for="account-name-input" class="form-label"><h6>Verification pin was sent to your email. Please enter this pin below:</h6></label>
                         <input type="text" class="form-control" id="pin" name="pin">
                     <div class="col-12 mt-4">
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Confirm Payment</button>
